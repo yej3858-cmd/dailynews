@@ -84,6 +84,26 @@ CATEGORY_PRIORITY = {
     "반도체": 1.2,
 }
 
+KOREAN_STOPWORDS = {
+    "기자",
+    "오늘",
+    "관련",
+    "통해",
+    "대해",
+    "대한",
+    "이번",
+    "지난",
+    "최근",
+    "정부",
+    "국내",
+    "국제",
+    "시장",
+    "정책",
+    "뉴스",
+    "보도",
+    "발표",
+}
+
 
 def tokenize(text: str) -> set[str]:
     return {
@@ -196,29 +216,129 @@ def assign_stars(score: float) -> int:
     return 1
 
 
+def extract_topical_keywords(item: dict[str, Any], limit: int = 5) -> list[str]:
+    base_text = f"{item.get('title', '')} {item.get('description', '')}"
+    tokens = [
+        token
+        for token in re.findall(r"[가-힣A-Za-z0-9]+", base_text)
+        if len(token) >= 2 and token.lower() not in KOREAN_STOPWORDS
+    ]
+    freq: dict[str, int] = {}
+    for token in tokens:
+        freq[token] = freq.get(token, 0) + 1
+
+    scored = sorted(freq.items(), key=lambda x: (x[1], len(x[0])), reverse=True)
+    concrete = [kw for kw, _ in scored if kw not in {"기사", "단독", "속보"}]
+    merged = item.get("matched_keywords", []) + concrete
+    uniq: list[str] = []
+    for kw in merged:
+        if kw not in uniq:
+            uniq.append(kw)
+    return uniq[:limit]
+
+
+def too_similar_to_title(text: str, title: str) -> bool:
+    title_tokens = tokenize(title)
+    text_tokens = tokenize(text)
+    if not title_tokens or not text_tokens:
+        return False
+    sim = jaccard(title_tokens, text_tokens)
+    return sim >= 0.45 or title[:16] in text
+
+
+def sanitize_editorial_line(line: str, title: str, fallback: str) -> str:
+    clean = line.strip()
+    if not clean:
+        return fallback
+    if too_similar_to_title(clean, title):
+        return fallback
+    return clean
+
+
 def build_structured_summary(item: dict[str, Any], cluster: list[dict[str, Any]], score: float) -> dict[str, str]:
-    top_keywords = item.get("matched_keywords", [])[:3]
-    keyword_text = ", ".join(top_keywords) if top_keywords else "거시·정책 이슈"
+    top_keywords = item.get("major_keywords", [])[:3]
+    keyword_text = ", ".join(top_keywords) if top_keywords else "핵심 변수"
+    title = item.get("title", "")
+    description = (item.get("description", "") or "").strip()
+    desc_part = description[:44] if description else "정책·시장 변수에 영향이 큰 사안으로 해석됩니다."
     return {
-        "핵심": f"{item['title'][:42]}",
-        "배경": f"{item.get('category', '일반')} 분야 현안과 연결된 이슈입니다.",
-        "확산": f"관련 보도가 {len(cluster)}건 이어지며 관심이 확대됐습니다.",
-        "포인트": f"{keyword_text} 키워드 중심으로 전개되고 있습니다.",
-        "종합": "향후 정책·시장 반응을 함께 볼 필요가 있습니다.",
+        "핵심": sanitize_editorial_line(
+            f"{desc_part}",
+            title,
+            "핵심 당사자들의 대응 방향이 추가로 확인되고 있습니다.",
+        ),
+        "배경": sanitize_editorial_line(
+            f"{item.get('category', '일반')} 현안의 연장선에서 파급 범위가 커진 이슈입니다.",
+            title,
+            "기존 현안의 누적 영향으로 중요도가 높아진 사안입니다.",
+        ),
+        "확산": sanitize_editorial_line(
+            f"주요 매체 {len({c.get('outlet','') for c in cluster})}곳에서 후속 보도를 이어가고 있습니다.",
+            title,
+            "여러 매체에서 후속 사실관계를 연속 보도하고 있습니다.",
+        ),
+        "포인트": sanitize_editorial_line(
+            f"{keyword_text} 등 핵심 변수의 방향성이 관전 포인트입니다.",
+            title,
+            "핵심 변수의 방향성과 당국·기업 대응이 관전 포인트입니다.",
+        ),
+        "종합": sanitize_editorial_line(
+            "단기 반응보다 후속 발표와 실행 단계에서의 변화 확인이 중요합니다.",
+            title,
+            "후속 발표의 구체성과 실행 속도를 함께 점검해야 합니다.",
+        ),
     }
 
 
 def build_article_5lines(item: dict[str, Any], cluster: list[dict[str, Any]], score: float) -> list[str]:
+    title = item.get("title", "")
     description = (item.get("description", "") or "").strip()
-    description = description[:64] if description else "관련 핵심 쟁점이 보도에서 함께 언급됐습니다."
-    keyword_text = ", ".join(item.get("matched_keywords", [])[:3]) or "핵심 현안"
-    return [
-        f"1) {item['title'][:44]}",
-        f"2) {description}",
-        f"3) {item.get('outlet', '주요 매체')} 보도를 통해 핵심 내용이 확인됐습니다.",
-        f"4) 관련 키워드는 {keyword_text} 입니다.",
-        "5) 추가 발표와 후속 조치 여부를 계속 확인할 필요가 있습니다.",
+    description = description[:64] if description else "핵심 쟁점과 이해관계자 반응이 함께 보도됐습니다."
+    keywords = item.get("major_keywords", [])[:3]
+    keyword_text = ", ".join(keywords) if keywords else "핵심 변수"
+    candidates = [
+        description,
+        f"{item.get('category', '일반')} 분야의 의사결정과 일정에 직접 영향을 줄 수 있는 내용입니다.",
+        f"{keyword_text} 중심으로 이해관계자들의 해석이 엇갈리고 있습니다.",
+        "후속 발표에서 수치·일정·집행 방식이 구체화되는지가 중요합니다.",
+        "단기 이슈에 그치지 않고 중장기 흐름으로 이어질 가능성이 거론됩니다.",
     ]
+    return [
+        sanitize_editorial_line(
+            line,
+            title,
+            "핵심 수치와 일정이 기사 본문에서 추가로 제시됐습니다.",
+        )
+        for line in candidates
+    ]
+
+
+def clean_title_score(title: str) -> float:
+    score = 0.0
+    if 12 <= len(title) <= 58:
+        score += 1.2
+    if "[" not in title and "]" not in title:
+        score += 0.5
+    if "속보" not in title and "단독" not in title:
+        score += 0.3
+    if "기자" not in title:
+        score += 0.2
+    return score
+
+
+def select_representative_article(cluster: list[dict[str, Any]]) -> dict[str, Any]:
+    """Choose the cleanest and most recent real title within the valid cluster window."""
+    timestamps = [datetime.fromisoformat(item["pub_date_kst"]).timestamp() for item in cluster]
+    min_ts, max_ts = min(timestamps), max(timestamps)
+    range_ts = max(1.0, max_ts - min_ts)
+
+    def rep_score(item: dict[str, Any]) -> float:
+        ts = datetime.fromisoformat(item["pub_date_kst"]).timestamp()
+        recency_norm = (ts - min_ts) / range_ts
+        return (recency_norm * 2.0) + clean_title_score(item.get("title", ""))
+
+    ranked = sorted(cluster, key=rep_score, reverse=True)
+    return ranked[0]
 
 
 def build_cluster_record(
@@ -227,7 +347,7 @@ def build_cluster_record(
     now: datetime,
     representative_reason: str,
 ) -> dict[str, Any]:
-    representative = sorted(cluster, key=lambda x: x["pub_date_kst"], reverse=True)[0]
+    representative = select_representative_article(cluster)
     score = importance_score(representative, cluster, trend_scores, now)
 
     representative["related_count"] = len(cluster)
@@ -235,7 +355,13 @@ def build_cluster_record(
     representative["categories_merged"] = sorted({item.get("category", "일반") for item in cluster})
     representative["score"] = round(score, 4)
     representative["importance_stars"] = assign_stars(score)
-    representative["major_keywords"] = representative.get("matched_keywords", [])[:5]
+    representative["major_keywords"] = extract_topical_keywords(representative, limit=5)
+    one_line_core = sanitize_editorial_line(
+        f"{representative.get('category', '일반')} 이슈가 정책·시장 반응에 미치는 영향이 커진 국면입니다.",
+        representative.get("title", ""),
+        "핵심 변수의 변동성이 확대되며 파급력이 커진 이슈입니다.",
+    )
+    representative["one_line_core"] = one_line_core
     representative["structured_summary"] = build_structured_summary(representative, cluster, score)
     representative["article_summary_5lines"] = build_article_5lines(representative, cluster, score)
     representative["cluster_representative_reason"] = representative_reason
@@ -267,15 +393,15 @@ def split_candidate_pools(items: list[dict[str, Any]]) -> tuple[list[dict[str, A
 def make_top_summary(main_items: list[dict[str, Any]], semicon_items: list[dict[str, Any]]) -> list[str]:
     if not main_items:
         return [
-            "오늘 상위 이슈를 구성할 기사 데이터가 부족합니다.",
-            "잠시 후 재생성 시 더 많은 기사 반영이 가능합니다.",
-            "반도체 섹션은 별도 키워드 우선순위로 유지됩니다.",
+            "지난 24시간(KST) 내 주요 이슈 데이터가 제한적입니다.",
+            "확인 가능한 사실 중심으로 브리핑을 최소 구성했습니다.",
+            "새로운 발표가 반영되면 항목이 즉시 보강됩니다.",
         ]
 
     return [
-        f"최상위 이슈: {main_items[0].get('category','일반')} · {main_items[0]['title'][:30]}",
-        f"국가/국제·정책·거시경제 파급력이 큰 뉴스 10건을 우선 선별했습니다.",
-        f"반도체 투자·생산·공급망 중심 뉴스 {len(semicon_items)}건을 별도 구성했습니다.",
+        "정책·거시경제·국제정세 중심으로 오늘의 핵심 흐름을 압축했습니다.",
+        f"복수 매체가 동시 보도한 상위 이슈를 우선 배치했습니다.",
+        f"반도체는 투자·생산·수요 체인 변화 중심으로 {len(semicon_items)}건을 선정했습니다.",
     ]
 
 
@@ -304,7 +430,7 @@ def main() -> None:
             cluster,
             trend_scores,
             now,
-            representative_reason="most_recent_article_in_main_cluster_within_24h",
+            representative_reason="cleanest_and_most_recent_real_title_within_main_24h_cluster",
         )
         for cluster in main_clusters
     ]
@@ -313,7 +439,7 @@ def main() -> None:
             cluster,
             trend_scores,
             now,
-            representative_reason="most_recent_article_in_semiconductor_cluster_within_24h",
+            representative_reason="cleanest_and_most_recent_real_title_within_semiconductor_24h_cluster",
         )
         for cluster in semicon_clusters
     ]

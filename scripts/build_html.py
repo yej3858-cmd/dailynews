@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import html
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -23,8 +24,18 @@ def stars(n: int) -> str:
 
 def render_keywords(keywords: list[str]) -> str:
     if not keywords:
-        return '<span class="chip">주요 이슈</span>'
+        return '<span class="chip">세부 키워드 확인중</span>'
     return "".join(f'<span class="chip">{html.escape(kw)}</span>' for kw in keywords)
+
+
+def format_kst_datetime(value: str) -> str:
+    if not value:
+        return ""
+    try:
+        dt = datetime.fromisoformat(value)
+    except ValueError:
+        return value
+    return dt.strftime("%Y.%m.%d %H:%M")
 
 
 def render_structured_summary(summary: dict[str, str]) -> str:
@@ -48,6 +59,7 @@ def render_card(item: dict[str, Any]) -> str:
     merged = ", ".join(item.get("categories_merged", [item.get("category", "일반")]))
     structured = item.get("structured_summary", {})
     article_5lines = item.get("article_summary_5lines", [])
+    pub_dt = format_kst_datetime(item.get("pub_date_kst", ""))
     return f"""
     <article class="card">
       <div class="meta-row">
@@ -56,11 +68,16 @@ def render_card(item: dict[str, Any]) -> str:
       </div>
 
       <h3>{html.escape(item.get('title', '제목 없음'))}</h3>
-      <p class="sub">{html.escape(item.get('outlet', '알 수 없음'))} · {html.escape(item.get('pub_date_kst', ''))}</p>
+      <p class="sub">{html.escape(item.get('outlet', '알 수 없음'))} · {html.escape(pub_dt)}</p>
 
       <div class="section-block">
         <p class="section-title">주요 키워드</p>
         <div class="keywords">{render_keywords(item.get('major_keywords', []))}</div>
+      </div>
+
+      <div class="section-block">
+        <p class="section-title">한줄 핵심</p>
+        <p class="core-line">{html.escape(item.get('one_line_core', '핵심 변수의 변화를 점검해야 할 이슈입니다.'))}</p>
       </div>
 
       <div class="section-block structured-box">
@@ -83,6 +100,7 @@ def build_html(payload: dict[str, Any]) -> str:
     date_for_title = date.replace("-", ".")
     page_title = f"{date_for_title} News Briefing"
     generated = payload.get("generated_at_kst", "")
+    generated_fmt = format_kst_datetime(generated)
     top_summary = payload.get("top_summary", [])
     main_news = payload.get("main_news", [])
     semiconductor_news = payload.get("semiconductor_news", [])
@@ -125,6 +143,12 @@ def build_html(payload: dict[str, Any]) -> str:
     h1 {{ font-size: 1.38rem; margin: 8px 0 8px; }}
     h2 {{ font-size: 1.08rem; margin: 22px 0 12px; color: #d3e1ff; }}
     .timestamp {{ color: var(--muted); font-size: 0.84rem; margin-bottom: 14px; }}
+    .window-note {{
+      margin: 0 0 12px;
+      color: #bfd0f6;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }}
     .summary-top {{
       background: #111a2a;
       border: 1px solid var(--border);
@@ -204,6 +228,7 @@ def build_html(payload: dict[str, Any]) -> str:
       font-size: 0.86rem;
     }}
     .summary-lines li {{ margin: 5px 0; }}
+    .core-line {{ margin: 0; color: #dce6ff; font-size: 0.88rem; }}
 
     .link {{
       display: inline-block;
@@ -224,7 +249,8 @@ def build_html(payload: dict[str, Any]) -> str:
 <body>
   <main class="container">
     <h1>{html.escape(page_title)}</h1>
-    <p class="timestamp">기준일: {html.escape(date)} · 생성시각(KST): {html.escape(generated)}</p>
+    <p class="timestamp">기준일: {html.escape(date)} · 생성시각(KST): {html.escape(generated_fmt)}</p>
+    <p class="window-note">Coverage window: past 24 hours (KST)</p>
 
     <section class="summary-top">
       <p class="title">오늘의 3줄 요약</p>
