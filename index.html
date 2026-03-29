@@ -3,16 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-  <title>데일리 코리안 뉴스 브리핑 - 2026-03-30</title>
+  <title>2026.03.30 News Briefing</title>
   <style>
     :root {
-      --bg: #0f1116;
-      --bg-card: #171b24;
-      --text: #f2f5ff;
-      --muted: #a2acc4;
-      --accent: #6aa6ff;
-      --chip: #243250;
-      --border: #2b3245;
+      --bg: #0b0f17;
+      --bg-card: #121927;
+      --text: #f4f7ff;
+      --muted: #a9b5d3;
+      --accent: #79adff;
+      --chip: #213453;
+      --border: #2b3750;
+      --block: #0f1522;
+      --label: #95b9ff;
     }
     * { box-sizing: border-box; }
     body {
@@ -20,58 +22,120 @@
       background: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
-      line-height: 1.45;
+      line-height: 1.48;
     }
     .container {
       width: min(760px, 100%);
       margin: 0 auto;
-      padding: 16px 14px 28px;
+      padding: 16px 14px 32px;
     }
-    h1 { font-size: 1.35rem; margin: 8px 0 6px; }
-    h2 { font-size: 1.05rem; margin: 20px 0 12px; color: #c8d5ff; }
-    .timestamp { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; }
+    h1 { font-size: 1.38rem; margin: 8px 0 8px; }
+    h2 { font-size: 1.08rem; margin: 22px 0 12px; color: #d3e1ff; }
+    .timestamp { color: var(--muted); font-size: 0.84rem; margin-bottom: 14px; }
     .summary-top {
-      background: #121826;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-    }
-    .summary-top ul { margin: 0; padding-left: 17px; }
-    .summary-top li { margin: 6px 0; }
-    .card {
-      background: var(--bg-card);
+      background: #111a2a;
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 14px;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+      margin-bottom: 16px;
     }
-    .meta-row { display: flex; justify-content: space-between; gap: 10px; }
-    .category { color: #9dc2ff; font-weight: 600; font-size: 0.88rem; }
-    .stars { color: #ffd76a; font-size: 0.9rem; }
-    h3 { margin: 8px 0 8px; font-size: 1.03rem; }
-    .sub { margin: 0 0 8px; font-size: 0.82rem; color: var(--muted); }
-    .keywords { display: flex; gap: 6px; flex-wrap: wrap; margin: 7px 0 8px; }
-    .chip { background: var(--chip); color: #cadeff; border-radius: 999px; padding: 4px 8px; font-size: 0.76rem; }
-    .summary { margin: 8px 0 10px; padding-left: 17px; color: #d8e0f6; font-size: 0.88rem; }
-    .summary li { margin: 4px 0; }
-    .link { color: var(--accent); font-weight: 600; text-decoration: none; }
+    .summary-top .title {
+      margin: 0 0 8px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--label);
+    }
+    .summary-top ul { margin: 0; padding-left: 18px; }
+    .summary-top li { margin: 6px 0; }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.24);
+    }
+    .meta-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+    .category { color: #a7c8ff; font-weight: 700; font-size: 0.88rem; }
+    .stars { color: #ffdd7a; font-size: 0.94rem; letter-spacing: 1px; }
+    h3 { margin: 6px 0 8px; font-size: 1.04rem; line-height: 1.35; }
+    .sub { margin: 0 0 10px; font-size: 0.82rem; color: var(--muted); }
+
+    .section-block {
+      background: var(--block);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    .section-title {
+      margin: 0 0 8px;
+      color: var(--label);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.1px;
+    }
+
+    .keywords { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip {
+      background: var(--chip);
+      color: #d5e7ff;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 0.76rem;
+    }
+
+    .structured-row {
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 8px;
+      margin: 6px 0;
+      align-items: start;
+    }
+    .structured-row .label {
+      color: #8eb8ff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding-top: 1px;
+    }
+    .structured-row .value {
+      color: #dfe8ff;
+      font-size: 0.85rem;
+    }
+
+    .summary-lines {
+      margin: 0;
+      padding-left: 18px;
+      color: #d9e3fb;
+      font-size: 0.86rem;
+    }
+    .summary-lines li { margin: 5px 0; }
+
+    .link {
+      display: inline-block;
+      margin-top: 4px;
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
     .link:hover { text-decoration: underline; }
+
     @media (min-width: 720px) {
       .container { padding-top: 24px; }
-      h1 { font-size: 1.6rem; }
+      h1 { font-size: 1.62rem; }
+      .card { padding: 16px; }
     }
   </style>
 </head>
 <body>
   <main class="container">
-    <h1>데일리 코리안 뉴스 브리핑</h1>
-    <p class="timestamp">기준일: 2026-03-30 · 생성시각(KST): 2026-03-30T00:19:21.366102+09:00</p>
+    <h1>2026.03.30 News Briefing</h1>
+    <p class="timestamp">기준일: 2026-03-30 · 생성시각(KST): 2026-03-30T00:49:02.579570+09:00</p>
 
     <section class="summary-top">
-      <h2>오늘의 3줄 요약</h2>
-      <ul><li>오늘의 최상위 이슈는 기술 분야의 ‘젤렌스키, 요르단 방문…방위 협력 방안 논의’ 입니다.</li><li>주요 뉴스 10건과 반도체 특화 뉴스 3건을 선별했습니다.</li><li>중복 보도를 클러스터링해 핵심 이슈 중심으로 압축 제공했습니다.</li></ul>
+      <p class="title">오늘의 3줄 요약</p>
+      <ul><li>최상위 이슈: 산업 · 이란 미사일 공격에 이스라엘 산업단지 공장 큰불</li><li>국가/국제·정책·거시경제 파급력이 큰 뉴스 10건을 우선 선별했습니다.</li><li>반도체 투자·생산·공급망 중심 뉴스 3건을 별도 구성했습니다.</li></ul>
     </section>
 
     <section>
@@ -79,122 +143,272 @@
       
     <article class="card">
       <div class="meta-row">
-        <span class="category">기술</span>
+        <span class="category">산업</span>
         <span class="stars">★★★★★</span>
       </div>
-      <h3>젤렌스키, 요르단 방문…방위 협력 방안 논의</h3>
-      <p class="sub">news.kbs.co.kr · 2026-03-30T00:03:00+09:00</p>
-      <div class="keywords"><span class="chip">일반</span></div>
-      <ul class="summary"><li>핵심: 젤렌스키, 요르단 방문…방위 협력 방안 논의</li><li>배경: 기술 분야에서 다수 매체가 동시 보도했습니다.</li><li>확산: 유사 기사 4건이 묶여 이슈 강도가 높게 평가되었습니다.</li><li>포인트: 주요 이슈 관련 키워드가 확인되었습니다.</li><li>종합: 중요도 점수 4.74로 오늘 브리핑 상위권에 반영되었습니다.</li></ul>
-      <a class="link" href="https://n.news.naver.com/mnews/article/056/0012151543?sid=104" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
-    </article>
-    
-    <article class="card">
-      <div class="meta-row">
-        <span class="category">사회</span>
-        <span class="stars">★★★★</span>
+
+      <h3>이란 미사일 공격에 이스라엘 산업단지 공장 큰불</h3>
+      <p class="sub">ytn.co.kr · 2026-03-30T00:31:00+09:00</p>
+
+      <div class="section-block">
+        <p class="section-title">주요 키워드</p>
+        <div class="keywords"><span class="chip">주요 이슈</span></div>
       </div>
-      <h3>철원군 베트남 계절근로자 마약검사 무료 지원</h3>
-      <p class="sub">kwnews.co.kr · 2026-03-30T00:13:00+09:00</p>
-      <div class="keywords"><span class="chip">일반</span></div>
-      <ul class="summary"><li>핵심: 철원군 베트남 계절근로자 마약검사 무료 지원</li><li>배경: 사회 분야에서 다수 매체가 동시 보도했습니다.</li><li>확산: 유사 기사 2건이 묶여 이슈 강도가 높게 평가되었습니다.</li><li>포인트: 주요 이슈 관련 키워드가 확인되었습니다.</li><li>종합: 중요도 점수 3.94로 오늘 브리핑 상위권에 반영되었습니다.</li></ul>
-      <a class="link" href="https://n.news.naver.com/mnews/article/087/0001183258?sid=102" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
-    </article>
-    
-    <article class="card">
-      <div class="meta-row">
-        <span class="category">경제, 산업</span>
-        <span class="stars">★★★★</span>
+
+      <div class="section-block structured-box">
+        <p class="section-title">구조화 요약</p>
+        <div class="structured-row"><span class="label">핵심</span><span class="value">이란 미사일 공격에 이스라엘 산업단지 공장 큰불</span></div><div class="structured-row"><span class="label">배경</span><span class="value">산업 분야 핵심 변수 변화가 반영된 사안입니다.</span></div><div class="structured-row"><span class="label">확산</span><span class="value">유사 기사 5건, 매체 5곳에서 동시 보도됐습니다.</span></div><div class="structured-row"><span class="label">포인트</span><span class="value">주요 키워드: 거시·정책 이슈.</span></div><div class="structured-row"><span class="label">종합</span><span class="value">영향도 점수 11.91로 오늘 상위 이슈로 선정했습니다.</span></div>
       </div>
-      <h3>[도전 6.3지선 출마합니다] 조한승 춘천시의원 다 선거구 예비후보</h3>
-      <p class="sub">kado.net · 2026-03-30T00:05:00+09:00</p>
-      <div class="keywords"><span class="chip">일반</span></div>
-      <ul class="summary"><li>핵심: [도전 6.3지선 출마합니다] 조한승 춘천시의원 다 선거구 예비후보</li><li>배경: 경제 분야에서 다수 매체가 동시 보도했습니다.</li><li>확산: 유사 기사 2건이 묶여 이슈 강도가 높게 평가되었습니다.</li><li>포인트: 주요 이슈 관련 키워드가 확인되었습니다.</li><li>종합: 중요도 점수 3.93로 오늘 브리핑 상위권에 반영되었습니다.</li></ul>
-      <a class="link" href="https://n.news.naver.com/mnews/article/654/0000172917?sid=102" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
-    </article>
-    
-    <article class="card">
-      <div class="meta-row">
-        <span class="category">산업</span>
-        <span class="stars">★★★★</span>
+
+      <div class="section-block lines-box">
+        <p class="section-title">기사 요약 5줄</p>
+        <ol class="summary-lines"><li>1) 산업 핵심 사안으로 분류됩니다.</li><li>2) 대표 제목은 ‘이란 미사일 공격에 이스라엘 산업단지 공장 큰불’ 입니다.</li><li>3) 중복 기사 5건을 묶어 이슈 단위로 정리했습니다.</li><li>4) 영향도 점수는 11.91, 중요도는 5성입니다.</li><li>5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.</li></ol>
       </div>
-      <h3>이스라엘 공업지대에 이란 미사일…“유해물질 유출”</h3>
-      <p class="sub">news.kbs.co.kr · 2026-03-30T00:03:00+09:00</p>
-      <div class="keywords"><span class="chip">일반</span></div>
-      <ul class="summary"><li>핵심: 이스라엘 공업지대에 이란 미사일…“유해물질 유출”</li><li>배경: 산업 분야에서 다수 매체가 동시 보도했습니다.</li><li>확산: 유사 기사 2건이 묶여 이슈 강도가 높게 평가되었습니다.</li><li>포인트: 주요 이슈 관련 키워드가 확인되었습니다.</li><li>종합: 중요도 점수 3.92로 오늘 브리핑 상위권에 반영되었습니다.</li></ul>
-      <a class="link" href="https://n.news.naver.com/mnews/article/056/0012151545?sid=104" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
+
+      <a class="link" href="https://n.news.naver.com/mnews/article/052/0002333646?sid=104" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
     </article>
     
     <article class="card">
       <div class="meta-row">
         <span class="category">국제</span>
-        <span class="stars">★★★★</span>
+        <span class="stars">★★★★★</span>
       </div>
-      <h3>이란 매체, 종전 조건 “미군 철수·호르무즈 통행료 징수” 주장</h3>
-      <p class="sub">segye.com · 2026-03-29T23:52:00+09:00</p>
-      <div class="keywords"><span class="chip">일반</span></div>
-      <ul class="summary"><li>핵심: 이란 매체, 종전 조건 “미군 철수·호르무즈 통행료 징수” 주장</li><li>배경: 국제 분야에서 다수 매체가 동시 보도했습니다.</li><li>확산: 유사 기사 2건이 묶여 이슈 강도가 높게 평가되었습니다.</li><li>포인트: 주요 이슈 관련 키워드가 확인되었습니다.</li><li>종합: 중요도 점수 3.90로 오늘 브리핑 상위권에 반영되었습니다.</li></ul>
-      <a class="link" href="https://n.news.naver.com/mnews/article/022/0004116590?sid=104" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
+
+      <h3>중동 전쟁 한 달...국내 증시 시총 상위 구도 어떻게 바뀌었나</h3>
+      <p class="sub">joongangenews.com · 2026-03-30T00:00:00+09:00</p>
+
+      <div class="section-block">
+        <p class="section-title">주요 키워드</p>
+        <div class="keywords"><span class="chip">주요 이슈</span></div>
+      </div>
+
+      <div class="section-block structured-box">
+        <p class="section-title">구조화 요약</p>
+        <div class="structured-row"><span class="label">핵심</span><span class="value">중동 전쟁 한 달...국내 증시 시총 상위 구도 어떻게 바뀌었나</span></div><div class="structured-row"><span class="label">배경</span><span class="value">국제 분야 핵심 변수 변화가 반영된 사안입니다.</span></div><div class="structured-row"><span class="label">확산</span><span class="value">유사 기사 1건, 매체 1곳에서 동시 보도됐습니다.</span></div><div class="structured-row"><span class="label">포인트</span><span class="value">주요 키워드: 거시·정책 이슈.</span></div><div class="structured-row"><span class="label">종합</span><span class="value">영향도 점수 11.11로 오늘 상위 이슈로 선정했습니다.</span></div>
+      </div>
+
+      <div class="section-block lines-box">
+        <p class="section-title">기사 요약 5줄</p>
+        <ol class="summary-lines"><li>1) 국제 핵심 사안으로 분류됩니다.</li><li>2) 대표 제목은 ‘중동 전쟁 한 달...국내 증시 시총 상위 구도 어떻게 바뀌었’ 입니다.</li><li>3) 중복 기사 1건을 묶어 이슈 단위로 정리했습니다.</li><li>4) 영향도 점수는 11.11, 중요도는 5성입니다.</li><li>5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.</li></ol>
+      </div>
+
+      <a class="link" href="https://www.joongangenews.com/news/articleView.html?idxno=506894" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
     </article>
     
     <article class="card">
       <div class="meta-row">
-        <span class="category">정치</span>
-        <span class="stars">★★★★</span>
+        <span class="category">기술</span>
+        <span class="stars">★★★★★</span>
       </div>
-      <h3>주호영, 컷오프 넘어 공천 개혁 투쟁…“보수 몰락 되풀이 말아야”</h3>
-      <p class="sub">biz.heraldcorp.com · 2026-03-29T23:04:00+09:00</p>
-      <div class="keywords"><span class="chip">일반</span></div>
-      <ul class="summary"><li>핵심: 주호영, 컷오프 넘어 공천 개혁 투쟁…“보수 몰락 되풀이 말아야”</li><li>배경: 정치 분야에서 다수 매체가 동시 보도했습니다.</li><li>확산: 유사 기사 2건이 묶여 이슈 강도가 높게 평가되었습니다.</li><li>포인트: 주요 이슈 관련 키워드가 확인되었습니다.</li><li>종합: 중요도 점수 3.81로 오늘 브리핑 상위권에 반영되었습니다.</li></ul>
-      <a class="link" href="https://n.news.naver.com/mnews/article/016/0002621126?sid=102" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
+
+      <h3>“에어택시 돈 안되고 규제 많아”… 도심항공교통서 손떼는 기업들</h3>
+      <p class="sub">donga.com · 2026-03-30T00:32:00+09:00</p>
+
+      <div class="section-block">
+        <p class="section-title">주요 키워드</p>
+        <div class="keywords"><span class="chip">주요 이슈</span></div>
+      </div>
+
+      <div class="section-block structured-box">
+        <p class="section-title">구조화 요약</p>
+        <div class="structured-row"><span class="label">핵심</span><span class="value">“에어택시 돈 안되고 규제 많아”… 도심항공교통서 손떼는 기업들</span></div><div class="structured-row"><span class="label">배경</span><span class="value">기술 분야 핵심 변수 변화가 반영된 사안입니다.</span></div><div class="structured-row"><span class="label">확산</span><span class="value">유사 기사 1건, 매체 1곳에서 동시 보도됐습니다.</span></div><div class="structured-row"><span class="label">포인트</span><span class="value">주요 키워드: 거시·정책 이슈.</span></div><div class="structured-row"><span class="label">종합</span><span class="value">영향도 점수 11.03로 오늘 상위 이슈로 선정했습니다.</span></div>
+      </div>
+
+      <div class="section-block lines-box">
+        <p class="section-title">기사 요약 5줄</p>
+        <ol class="summary-lines"><li>1) 기술 핵심 사안으로 분류됩니다.</li><li>2) 대표 제목은 ‘“에어택시 돈 안되고 규제 많아”… 도심항공교통서 손떼는 기업’ 입니다.</li><li>3) 중복 기사 1건을 묶어 이슈 단위로 정리했습니다.</li><li>4) 영향도 점수는 11.03, 중요도는 5성입니다.</li><li>5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.</li></ol>
+      </div>
+
+      <a class="link" href="https://n.news.naver.com/mnews/article/020/0003707921?sid=101" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
     </article>
     
     <article class="card">
       <div class="meta-row">
-        <span class="category">정치</span>
-        <span class="stars">★★★★</span>
+        <span class="category">국제</span>
+        <span class="stars">★★★★★</span>
       </div>
-      <h3>임명배 구미시장 예비후보, &quot;기업가정신의 뿌리는 박정희 대통령의 리더...</h3>
-      <p class="sub">gukjenews.com · 2026-03-30T00:18:00+09:00</p>
-      <div class="keywords"><span class="chip">일반</span></div>
-      <ul class="summary"><li>핵심: 임명배 구미시장 예비후보, &quot;기업가정신의 뿌리는 박정희 대통령의 리더...</li><li>배경: 정치 분야에서 다수 매체가 동시 보도했습니다.</li><li>확산: 유사 기사 1건이 묶여 이슈 강도가 높게 평가되었습니다.</li><li>포인트: 주요 이슈 관련 키워드가 확인되었습니다.</li><li>종합: 중요도 점수 3.31로 오늘 브리핑 상위권에 반영되었습니다.</li></ul>
-      <a class="link" href="https://www.gukjenews.com/news/articleView.html?idxno=3542965" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
+
+      <h3>철원군 지원 &#x27;수나코티 현대식 온실시설 프로젝트&#x27; 결실</h3>
+      <p class="sub">kwnews.co.kr · 2026-03-30T00:13:00+09:00</p>
+
+      <div class="section-block">
+        <p class="section-title">주요 키워드</p>
+        <div class="keywords"><span class="chip">주요 이슈</span></div>
+      </div>
+
+      <div class="section-block structured-box">
+        <p class="section-title">구조화 요약</p>
+        <div class="structured-row"><span class="label">핵심</span><span class="value">철원군 지원 &#x27;수나코티 현대식 온실시설 프로젝트&#x27; 결실</span></div><div class="structured-row"><span class="label">배경</span><span class="value">국제 분야 핵심 변수 변화가 반영된 사안입니다.</span></div><div class="structured-row"><span class="label">확산</span><span class="value">유사 기사 3건, 매체 3곳에서 동시 보도됐습니다.</span></div><div class="structured-row"><span class="label">포인트</span><span class="value">주요 키워드: 거시·정책 이슈.</span></div><div class="structured-row"><span class="label">종합</span><span class="value">영향도 점수 9.91로 오늘 상위 이슈로 선정했습니다.</span></div>
+      </div>
+
+      <div class="section-block lines-box">
+        <p class="section-title">기사 요약 5줄</p>
+        <ol class="summary-lines"><li>1) 국제 핵심 사안으로 분류됩니다.</li><li>2) 대표 제목은 ‘철원군 지원 &#x27;수나코티 현대식 온실시설 프로젝트&#x27; 결실’ 입니다.</li><li>3) 중복 기사 3건을 묶어 이슈 단위로 정리했습니다.</li><li>4) 영향도 점수는 9.91, 중요도는 5성입니다.</li><li>5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.</li></ol>
+      </div>
+
+      <a class="link" href="https://n.news.naver.com/mnews/article/087/0001183260?sid=102" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
     </article>
     
     <article class="card">
       <div class="meta-row">
         <span class="category">경제</span>
-        <span class="stars">★★★★</span>
+        <span class="stars">★★★★★</span>
       </div>
-      <h3>차량 5부제 민간 확대 가능성 시사… 정부, ‘에너지 절약’ 방점</h3>
-      <p class="sub">kmib.co.kr · 2026-03-30T00:18:00+09:00</p>
-      <div class="keywords"><span class="chip">일반</span></div>
-      <ul class="summary"><li>핵심: 차량 5부제 민간 확대 가능성 시사… 정부, ‘에너지 절약’ 방점</li><li>배경: 경제 분야에서 다수 매체가 동시 보도했습니다.</li><li>확산: 유사 기사 1건이 묶여 이슈 강도가 높게 평가되었습니다.</li><li>포인트: 주요 이슈 관련 키워드가 확인되었습니다.</li><li>종합: 중요도 점수 3.31로 오늘 브리핑 상위권에 반영되었습니다.</li></ul>
-      <a class="link" href="https://n.news.naver.com/mnews/article/005/0001839942?sid=101" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
+
+      <h3>[차세현의 글로벌 이슈 진단] 이란 수렁에 빠진 트럼프, 시진핑·푸틴은...</h3>
+      <p class="sub">joongang.co.kr · 2026-03-30T00:17:00+09:00</p>
+
+      <div class="section-block">
+        <p class="section-title">주요 키워드</p>
+        <div class="keywords"><span class="chip">주요 이슈</span></div>
+      </div>
+
+      <div class="section-block structured-box">
+        <p class="section-title">구조화 요약</p>
+        <div class="structured-row"><span class="label">핵심</span><span class="value">[차세현의 글로벌 이슈 진단] 이란 수렁에 빠진 트럼프, 시진핑·푸틴은...</span></div><div class="structured-row"><span class="label">배경</span><span class="value">경제 분야 핵심 변수 변화가 반영된 사안입니다.</span></div><div class="structured-row"><span class="label">확산</span><span class="value">유사 기사 1건, 매체 1곳에서 동시 보도됐습니다.</span></div><div class="structured-row"><span class="label">포인트</span><span class="value">주요 키워드: 거시·정책 이슈.</span></div><div class="structured-row"><span class="label">종합</span><span class="value">영향도 점수 9.28로 오늘 상위 이슈로 선정했습니다.</span></div>
+      </div>
+
+      <div class="section-block lines-box">
+        <p class="section-title">기사 요약 5줄</p>
+        <ol class="summary-lines"><li>1) 경제 핵심 사안으로 분류됩니다.</li><li>2) 대표 제목은 ‘[차세현의 글로벌 이슈 진단] 이란 수렁에 빠진 트럼프, 시진’ 입니다.</li><li>3) 중복 기사 1건을 묶어 이슈 단위로 정리했습니다.</li><li>4) 영향도 점수는 9.28, 중요도는 5성입니다.</li><li>5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.</li></ol>
+      </div>
+
+      <a class="link" href="https://n.news.naver.com/mnews/article/025/0003512487?sid=110" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
     </article>
     
     <article class="card">
       <div class="meta-row">
-        <span class="category">사회</span>
-        <span class="stars">★★★★</span>
+        <span class="category">경제</span>
+        <span class="stars">★★★★★</span>
       </div>
-      <h3>&#x27;너희들의 설레는 새학기를 따뜻하게 응원해&#x27;</h3>
-      <p class="sub">gjdream.com · 2026-03-30T00:18:00+09:00</p>
-      <div class="keywords"><span class="chip">일반</span></div>
-      <ul class="summary"><li>핵심: &#x27;너희들의 설레는 새학기를 따뜻하게 응원해&#x27;</li><li>배경: 사회 분야에서 다수 매체가 동시 보도했습니다.</li><li>확산: 유사 기사 1건이 묶여 이슈 강도가 높게 평가되었습니다.</li><li>포인트: 주요 이슈 관련 키워드가 확인되었습니다.</li><li>종합: 중요도 점수 3.31로 오늘 브리핑 상위권에 반영되었습니다.</li></ul>
-      <a class="link" href="http://www.gjdream.com/news/articleView.html?idxno=668172" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
+
+      <h3>[천자칼럼] 후티의 &#x27;홍해 위협&#x27;</h3>
+      <p class="sub">hankyung.com · 2026-03-30T00:07:00+09:00</p>
+
+      <div class="section-block">
+        <p class="section-title">주요 키워드</p>
+        <div class="keywords"><span class="chip">주요 이슈</span></div>
+      </div>
+
+      <div class="section-block structured-box">
+        <p class="section-title">구조화 요약</p>
+        <div class="structured-row"><span class="label">핵심</span><span class="value">[천자칼럼] 후티의 &#x27;홍해 위협&#x27;</span></div><div class="structured-row"><span class="label">배경</span><span class="value">경제 분야 핵심 변수 변화가 반영된 사안입니다.</span></div><div class="structured-row"><span class="label">확산</span><span class="value">유사 기사 1건, 매체 1곳에서 동시 보도됐습니다.</span></div><div class="structured-row"><span class="label">포인트</span><span class="value">주요 키워드: 거시·정책 이슈.</span></div><div class="structured-row"><span class="label">종합</span><span class="value">영향도 점수 9.26로 오늘 상위 이슈로 선정했습니다.</span></div>
+      </div>
+
+      <div class="section-block lines-box">
+        <p class="section-title">기사 요약 5줄</p>
+        <ol class="summary-lines"><li>1) 경제 핵심 사안으로 분류됩니다.</li><li>2) 대표 제목은 ‘[천자칼럼] 후티의 &#x27;홍해 위협&#x27;’ 입니다.</li><li>3) 중복 기사 1건을 묶어 이슈 단위로 정리했습니다.</li><li>4) 영향도 점수는 9.26, 중요도는 5성입니다.</li><li>5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.</li></ol>
+      </div>
+
+      <a class="link" href="https://n.news.naver.com/mnews/article/015/0005268366?sid=110" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
     </article>
     
     <article class="card">
       <div class="meta-row">
         <span class="category">국제</span>
-        <span class="stars">★★★★</span>
+        <span class="stars">★★★★★</span>
       </div>
-      <h3>항공사들 운항 줄이고 요금 인상… 수익성 방어 총력</h3>
-      <p class="sub">kmib.co.kr · 2026-03-30T00:18:00+09:00</p>
-      <div class="keywords"><span class="chip">일반</span></div>
-      <ul class="summary"><li>핵심: 항공사들 운항 줄이고 요금 인상… 수익성 방어 총력</li><li>배경: 국제 분야에서 다수 매체가 동시 보도했습니다.</li><li>확산: 유사 기사 1건이 묶여 이슈 강도가 높게 평가되었습니다.</li><li>포인트: 주요 이슈 관련 키워드가 확인되었습니다.</li><li>종합: 중요도 점수 3.31로 오늘 브리핑 상위권에 반영되었습니다.</li></ul>
-      <a class="link" href="https://n.news.naver.com/mnews/article/005/0001839941?sid=101" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
+
+      <h3>[미국·이란 전쟁]고유가와 물가상승 ‘비상’…지역경제 ‘흔들’</h3>
+      <p class="sub">kwnews.co.kr · 2026-03-30T00:01:00+09:00</p>
+
+      <div class="section-block">
+        <p class="section-title">주요 키워드</p>
+        <div class="keywords"><span class="chip">주요 이슈</span></div>
+      </div>
+
+      <div class="section-block structured-box">
+        <p class="section-title">구조화 요약</p>
+        <div class="structured-row"><span class="label">핵심</span><span class="value">[미국·이란 전쟁]고유가와 물가상승 ‘비상’…지역경제 ‘흔들’</span></div><div class="structured-row"><span class="label">배경</span><span class="value">국제 분야 핵심 변수 변화가 반영된 사안입니다.</span></div><div class="structured-row"><span class="label">확산</span><span class="value">유사 기사 1건, 매체 1곳에서 동시 보도됐습니다.</span></div><div class="structured-row"><span class="label">포인트</span><span class="value">주요 키워드: 거시·정책 이슈.</span></div><div class="structured-row"><span class="label">종합</span><span class="value">영향도 점수 9.24로 오늘 상위 이슈로 선정했습니다.</span></div>
+      </div>
+
+      <div class="section-block lines-box">
+        <p class="section-title">기사 요약 5줄</p>
+        <ol class="summary-lines"><li>1) 국제 핵심 사안으로 분류됩니다.</li><li>2) 대표 제목은 ‘[미국·이란 전쟁]고유가와 물가상승 ‘비상’…지역경제 ‘흔들’’ 입니다.</li><li>3) 중복 기사 1건을 묶어 이슈 단위로 정리했습니다.</li><li>4) 영향도 점수는 9.24, 중요도는 5성입니다.</li><li>5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.</li></ol>
+      </div>
+
+      <a class="link" href="https://n.news.naver.com/mnews/article/087/0001183166?sid=101" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
+    </article>
+    
+    <article class="card">
+      <div class="meta-row">
+        <span class="category">국제</span>
+        <span class="stars">★★★★★</span>
+      </div>
+
+      <h3>금테크 막차 탔다가 &#x27;비명&#x27;… 미·이란 전쟁 속 금값 하락, 개미들 &#x27;패닉...</h3>
+      <p class="sub">jnilbo.com · 2026-03-30T00:00:00+09:00</p>
+
+      <div class="section-block">
+        <p class="section-title">주요 키워드</p>
+        <div class="keywords"><span class="chip">주요 이슈</span></div>
+      </div>
+
+      <div class="section-block structured-box">
+        <p class="section-title">구조화 요약</p>
+        <div class="structured-row"><span class="label">핵심</span><span class="value">금테크 막차 탔다가 &#x27;비명&#x27;… 미·이란 전쟁 속 금값 하락, 개미들 &#x27;패닉.</span></div><div class="structured-row"><span class="label">배경</span><span class="value">국제 분야 핵심 변수 변화가 반영된 사안입니다.</span></div><div class="structured-row"><span class="label">확산</span><span class="value">유사 기사 1건, 매체 1곳에서 동시 보도됐습니다.</span></div><div class="structured-row"><span class="label">포인트</span><span class="value">주요 키워드: 거시·정책 이슈.</span></div><div class="structured-row"><span class="label">종합</span><span class="value">영향도 점수 9.24로 오늘 상위 이슈로 선정했습니다.</span></div>
+      </div>
+
+      <div class="section-block lines-box">
+        <p class="section-title">기사 요약 5줄</p>
+        <ol class="summary-lines"><li>1) 국제 핵심 사안으로 분류됩니다.</li><li>2) 대표 제목은 ‘금테크 막차 탔다가 &#x27;비명&#x27;… 미·이란 전쟁 속 금값 하락, ’ 입니다.</li><li>3) 중복 기사 1건을 묶어 이슈 단위로 정리했습니다.</li><li>4) 영향도 점수는 9.24, 중요도는 5성입니다.</li><li>5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.</li></ol>
+      </div>
+
+      <a class="link" href="https://www.jnilbo.com/news/articleView.html?idxno=90000027608" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
+    </article>
+    
+    <article class="card">
+      <div class="meta-row">
+        <span class="category">경제</span>
+        <span class="stars">★★★★★</span>
+      </div>
+
+      <h3>스탠다드차타드, 단기 XRP 전망 하향에도 장기 목표가 상향 조정</h3>
+      <p class="sub">tokenpost.kr · 2026-03-30T00:12:00+09:00</p>
+
+      <div class="section-block">
+        <p class="section-title">주요 키워드</p>
+        <div class="keywords"><span class="chip">주요 이슈</span></div>
+      </div>
+
+      <div class="section-block structured-box">
+        <p class="section-title">구조화 요약</p>
+        <div class="structured-row"><span class="label">핵심</span><span class="value">스탠다드차타드, 단기 XRP 전망 하향에도 장기 목표가 상향 조정</span></div><div class="structured-row"><span class="label">배경</span><span class="value">경제 분야 핵심 변수 변화가 반영된 사안입니다.</span></div><div class="structured-row"><span class="label">확산</span><span class="value">유사 기사 1건, 매체 1곳에서 동시 보도됐습니다.</span></div><div class="structured-row"><span class="label">포인트</span><span class="value">주요 키워드: 거시·정책 이슈.</span></div><div class="structured-row"><span class="label">종합</span><span class="value">영향도 점수 9.19로 오늘 상위 이슈로 선정했습니다.</span></div>
+      </div>
+
+      <div class="section-block lines-box">
+        <p class="section-title">기사 요약 5줄</p>
+        <ol class="summary-lines"><li>1) 경제 핵심 사안으로 분류됩니다.</li><li>2) 대표 제목은 ‘스탠다드차타드, 단기 XRP 전망 하향에도 장기 목표가 상향 ’ 입니다.</li><li>3) 중복 기사 1건을 묶어 이슈 단위로 정리했습니다.</li><li>4) 영향도 점수는 9.19, 중요도는 5성입니다.</li><li>5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.</li></ol>
+      </div>
+
+      <a class="link" href="https://www.tokenpost.kr/news/cryptocurrency/344369" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
+    </article>
+    
+    <article class="card">
+      <div class="meta-row">
+        <span class="category">국제</span>
+        <span class="stars">★★★★★</span>
+      </div>
+
+      <h3>높은 집값·대출 &#x27;이중장벽&#x27;에 막혔다…&#x27;脫서울&#x27; 가속</h3>
+      <p class="sub">news.tf.co.kr · 2026-03-30T00:00:00+09:00</p>
+
+      <div class="section-block">
+        <p class="section-title">주요 키워드</p>
+        <div class="keywords"><span class="chip">주요 이슈</span></div>
+      </div>
+
+      <div class="section-block structured-box">
+        <p class="section-title">구조화 요약</p>
+        <div class="structured-row"><span class="label">핵심</span><span class="value">높은 집값·대출 &#x27;이중장벽&#x27;에 막혔다…&#x27;脫서울&#x27; 가속</span></div><div class="structured-row"><span class="label">배경</span><span class="value">국제 분야 핵심 변수 변화가 반영된 사안입니다.</span></div><div class="structured-row"><span class="label">확산</span><span class="value">유사 기사 1건, 매체 1곳에서 동시 보도됐습니다.</span></div><div class="structured-row"><span class="label">포인트</span><span class="value">주요 키워드: 거시·정책 이슈.</span></div><div class="structured-row"><span class="label">종합</span><span class="value">영향도 점수 9.15로 오늘 상위 이슈로 선정했습니다.</span></div>
+      </div>
+
+      <div class="section-block lines-box">
+        <p class="section-title">기사 요약 5줄</p>
+        <ol class="summary-lines"><li>1) 국제 핵심 사안으로 분류됩니다.</li><li>2) 대표 제목은 ‘높은 집값·대출 &#x27;이중장벽&#x27;에 막혔다…&#x27;脫서울&#x27; 가속’ 입니다.</li><li>3) 중복 기사 1건을 묶어 이슈 단위로 정리했습니다.</li><li>4) 영향도 점수는 9.15, 중요도는 5성입니다.</li><li>5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.</li></ol>
+      </div>
+
+      <a class="link" href="https://n.news.naver.com/mnews/article/629/0000486240?sid=101" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
     </article>
     
     </section>
@@ -207,35 +421,80 @@
         <span class="category">반도체</span>
         <span class="stars">★★★★★</span>
       </div>
-      <h3>삼성전자, 2028년 &#x27;꿈의 반도체&#x27; 양산한다</h3>
-      <p class="sub">hankyung.com · 2026-03-29T18:08:00+09:00</p>
-      <div class="keywords"><span class="chip">반도체</span><span class="chip">HBM</span><span class="chip">삼성전자</span><span class="chip">파운드리</span></div>
-      <ul class="summary"><li>핵심: 삼성전자, 2028년 &#x27;꿈의 반도체&#x27; 양산한다</li><li>배경: 반도체 분야에서 다수 매체가 동시 보도했습니다.</li><li>확산: 유사 기사 1건이 묶여 이슈 강도가 높게 평가되었습니다.</li><li>포인트: 반도체, HBM, 삼성전자 관련 키워드가 확인되었습니다.</li><li>종합: 중요도 점수 6.95로 오늘 브리핑 상위권에 반영되었습니다.</li></ul>
-      <a class="link" href="https://n.news.naver.com/mnews/article/015/0005268315?sid=101" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
-    </article>
-    
-    <article class="card">
-      <div class="meta-row">
-        <span class="category">반도체</span>
-        <span class="stars">★★★★★</span>
-      </div>
-      <h3>삼성바이오, 창사 이래 첫 파업 위기…&quot;노조 찬성률 95.5%&quot;</h3>
-      <p class="sub">fnnews.com · 2026-03-29T20:56:00+09:00</p>
-      <div class="keywords"><span class="chip">삼성전자</span></div>
-      <ul class="summary"><li>핵심: 삼성바이오, 창사 이래 첫 파업 위기…&quot;노조 찬성률 95.5%&quot;</li><li>배경: 반도체 분야에서 다수 매체가 동시 보도했습니다.</li><li>확산: 유사 기사 5건이 묶여 이슈 강도가 높게 평가되었습니다.</li><li>포인트: 삼성전자 관련 키워드가 확인되었습니다.</li><li>종합: 중요도 점수 6.62로 오늘 브리핑 상위권에 반영되었습니다.</li></ul>
-      <a class="link" href="https://n.news.naver.com/mnews/article/014/0005499058?sid=105" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
-    </article>
-    
-    <article class="card">
-      <div class="meta-row">
-        <span class="category">반도체</span>
-        <span class="stars">★★★★★</span>
-      </div>
+
       <h3>TSMC 2년치 물량 완판, 삼성전자 파운드리 기회될까</h3>
       <p class="sub">chosun.com · 2026-03-29T15:51:00+09:00</p>
-      <div class="keywords"><span class="chip">반도체</span><span class="chip">삼성전자</span><span class="chip">파운드리</span></div>
-      <ul class="summary"><li>핵심: TSMC 2년치 물량 완판, 삼성전자 파운드리 기회될까</li><li>배경: 반도체 분야에서 다수 매체가 동시 보도했습니다.</li><li>확산: 유사 기사 2건이 묶여 이슈 강도가 높게 평가되었습니다.</li><li>포인트: 반도체, 삼성전자, 파운드리 관련 키워드가 확인되었습니다.</li><li>종합: 중요도 점수 6.57로 오늘 브리핑 상위권에 반영되었습니다.</li></ul>
+
+      <div class="section-block">
+        <p class="section-title">주요 키워드</p>
+        <div class="keywords"><span class="chip">반도체</span><span class="chip">삼성전자</span><span class="chip">파운드리</span></div>
+      </div>
+
+      <div class="section-block structured-box">
+        <p class="section-title">구조화 요약</p>
+        <div class="structured-row"><span class="label">핵심</span><span class="value">TSMC 2년치 물량 완판, 삼성전자 파운드리 기회될까</span></div><div class="structured-row"><span class="label">배경</span><span class="value">반도체 분야 핵심 변수 변화가 반영된 사안입니다.</span></div><div class="structured-row"><span class="label">확산</span><span class="value">유사 기사 3건, 매체 3곳에서 동시 보도됐습니다.</span></div><div class="structured-row"><span class="label">포인트</span><span class="value">주요 키워드: 반도체, 삼성전자, 파운드리.</span></div><div class="structured-row"><span class="label">종합</span><span class="value">영향도 점수 13.38로 오늘 상위 이슈로 선정했습니다.</span></div>
+      </div>
+
+      <div class="section-block lines-box">
+        <p class="section-title">기사 요약 5줄</p>
+        <ol class="summary-lines"><li>1) 반도체 핵심 사안으로 분류됩니다.</li><li>2) 대표 제목은 ‘TSMC 2년치 물량 완판, 삼성전자 파운드리 기회될까’ 입니다.</li><li>3) 중복 기사 3건을 묶어 이슈 단위로 정리했습니다.</li><li>4) 영향도 점수는 13.38, 중요도는 5성입니다.</li><li>5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.</li></ol>
+      </div>
+
       <a class="link" href="https://n.news.naver.com/mnews/article/023/0003967500?sid=105" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
+    </article>
+    
+    <article class="card">
+      <div class="meta-row">
+        <span class="category">반도체</span>
+        <span class="stars">★★★★★</span>
+      </div>
+
+      <h3>AI 거품 붕괴 신호탄…중동 전쟁·유가 폭등이 쏘아 올린 &#x27;다중 위기&#x27; [중...</h3>
+      <p class="sub">g-enews.com · 2026-03-29T08:26:00+09:00</p>
+
+      <div class="section-block">
+        <p class="section-title">주요 키워드</p>
+        <div class="keywords"><span class="chip">반도체</span><span class="chip">HBM</span><span class="chip">SK하이닉스</span><span class="chip">삼성전자</span><span class="chip">D램</span></div>
+      </div>
+
+      <div class="section-block structured-box">
+        <p class="section-title">구조화 요약</p>
+        <div class="structured-row"><span class="label">핵심</span><span class="value">AI 거품 붕괴 신호탄…중동 전쟁·유가 폭등이 쏘아 올린 &#x27;다중 위기&#x27; [중</span></div><div class="structured-row"><span class="label">배경</span><span class="value">반도체 분야 핵심 변수 변화가 반영된 사안입니다.</span></div><div class="structured-row"><span class="label">확산</span><span class="value">유사 기사 1건, 매체 1곳에서 동시 보도됐습니다.</span></div><div class="structured-row"><span class="label">포인트</span><span class="value">주요 키워드: 반도체, HBM, SK하이닉스.</span></div><div class="structured-row"><span class="label">종합</span><span class="value">영향도 점수 12.15로 오늘 상위 이슈로 선정했습니다.</span></div>
+      </div>
+
+      <div class="section-block lines-box">
+        <p class="section-title">기사 요약 5줄</p>
+        <ol class="summary-lines"><li>1) 반도체 핵심 사안으로 분류됩니다.</li><li>2) 대표 제목은 ‘AI 거품 붕괴 신호탄…중동 전쟁·유가 폭등이 쏘아 올린 &#x27;다’ 입니다.</li><li>3) 중복 기사 1건을 묶어 이슈 단위로 정리했습니다.</li><li>4) 영향도 점수는 12.15, 중요도는 5성입니다.</li><li>5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.</li></ol>
+      </div>
+
+      <a class="link" href="https://www.g-enews.com/view.php?ud=202603290800036823fbbec65dfb_1" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
+    </article>
+    
+    <article class="card">
+      <div class="meta-row">
+        <span class="category">반도체</span>
+        <span class="stars">★★★★★</span>
+      </div>
+
+      <h3>구글 &#x27;터보퀀트&#x27; 쇼크… 엇갈린 반도체 전망</h3>
+      <p class="sub">fnnews.com · 2026-03-29T18:20:00+09:00</p>
+
+      <div class="section-block">
+        <p class="section-title">주요 키워드</p>
+        <div class="keywords"><span class="chip">반도체</span><span class="chip">HBM</span></div>
+      </div>
+
+      <div class="section-block structured-box">
+        <p class="section-title">구조화 요약</p>
+        <div class="structured-row"><span class="label">핵심</span><span class="value">구글 &#x27;터보퀀트&#x27; 쇼크… 엇갈린 반도체 전망</span></div><div class="structured-row"><span class="label">배경</span><span class="value">반도체 분야 핵심 변수 변화가 반영된 사안입니다.</span></div><div class="structured-row"><span class="label">확산</span><span class="value">유사 기사 3건, 매체 2곳에서 동시 보도됐습니다.</span></div><div class="structured-row"><span class="label">포인트</span><span class="value">주요 키워드: 반도체, HBM.</span></div><div class="structured-row"><span class="label">종합</span><span class="value">영향도 점수 11.94로 오늘 상위 이슈로 선정했습니다.</span></div>
+      </div>
+
+      <div class="section-block lines-box">
+        <p class="section-title">기사 요약 5줄</p>
+        <ol class="summary-lines"><li>1) 반도체 핵심 사안으로 분류됩니다.</li><li>2) 대표 제목은 ‘구글 &#x27;터보퀀트&#x27; 쇼크… 엇갈린 반도체 전망’ 입니다.</li><li>3) 중복 기사 3건을 묶어 이슈 단위로 정리했습니다.</li><li>4) 영향도 점수는 11.94, 중요도는 5성입니다.</li><li>5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.</li></ol>
+      </div>
+
+      <a class="link" href="https://n.news.naver.com/mnews/article/014/0005498966?sid=101" target="_blank" rel="noopener noreferrer">기사 원문 보기</a>
     </article>
     
     </section>
