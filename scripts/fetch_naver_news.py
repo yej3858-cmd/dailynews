@@ -154,6 +154,8 @@ def fetch_trend_scores(keywords: list[str]) -> dict[str, float]:
 
 def build_news_items(raw_items: list[dict[str, Any]], category: str, query: str) -> list[NewsItem]:
     news_items: list[NewsItem] = []
+    now_kst = datetime.now(tz=KST)
+    cutoff_kst = now_kst - timedelta(hours=24)
     for raw in raw_items:
         title = _strip_html(raw.get("title", ""))
         description = _strip_html(raw.get("description", ""))
@@ -166,6 +168,9 @@ def build_news_items(raw_items: list[dict[str, Any]], category: str, query: str)
         try:
             pub_date_utc, pub_date_kst = _parse_pub_date(pub_raw)
         except ValueError:
+            continue
+        pub_kst_dt = datetime.fromisoformat(pub_date_kst)
+        if pub_kst_dt < cutoff_kst or pub_kst_dt > now_kst:
             continue
 
         text_blob = f"{title} {description} {query}".lower()

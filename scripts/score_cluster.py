@@ -256,6 +256,21 @@ def main() -> None:
     items = payload.get("items", [])
     trend_scores = payload.get("trend_scores", {})
     now = datetime.now(tz=KST)
+    cutoff = now.timestamp() - (24 * 3600)
+
+    # Safety filter: only rank/cluster stories from the most recent 24 hours in KST.
+    filtered_items: list[dict[str, Any]] = []
+    for item in items:
+        pub_kst = item.get("pub_date_kst")
+        if not pub_kst:
+            continue
+        try:
+            ts = datetime.fromisoformat(pub_kst).timestamp()
+        except ValueError:
+            continue
+        if cutoff <= ts <= now.timestamp():
+            filtered_items.append(item)
+    items = filtered_items
 
     clusters = cluster_items(items)
     merged = [build_cluster_record(cluster, trend_scores, now) for cluster in clusters]
@@ -277,7 +292,7 @@ def main() -> None:
         "main_news": main_items,
         "semiconductor_news": semicon_items,
         "stats": {
-            "raw_candidates": len(items),
+            "raw_candidates_24h": len(items),
             "clustered_groups": len(clusters),
             "trend_boost_enabled": bool(trend_scores),
         },

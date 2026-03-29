@@ -80,6 +80,8 @@ def render_card(item: dict[str, Any]) -> str:
 
 def build_html(payload: dict[str, Any]) -> str:
     date = payload.get("date", "")
+    date_for_title = date.replace("-", ".")
+    page_title = f"{date_for_title} News Briefing"
     generated = payload.get("generated_at_kst", "")
     top_summary = payload.get("top_summary", [])
     main_news = payload.get("main_news", [])
@@ -94,7 +96,7 @@ def build_html(payload: dict[str, Any]) -> str:
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-  <title>데일리 코리안 뉴스 브리핑 - {html.escape(date)}</title>
+  <title>{html.escape(page_title)}</title>
   <style>
     :root {{
       --bg: #0b0f17;
@@ -221,7 +223,7 @@ def build_html(payload: dict[str, Any]) -> str:
 </head>
 <body>
   <main class="container">
-    <h1>데일리 코리안 뉴스 브리핑</h1>
+    <h1>{html.escape(page_title)}</h1>
     <p class="timestamp">기준일: {html.escape(date)} · 생성시각(KST): {html.escape(generated)}</p>
 
     <section class="summary-top">
