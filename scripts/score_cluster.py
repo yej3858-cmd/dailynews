@@ -20,6 +20,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 KST = ZoneInfo("Asia/Seoul")
+MAIN_CATEGORIES = {"정치", "경제", "사회", "국제", "기술", "산업"}
 
 SEMICONDUCTOR_KEYWORDS = {
     "반도체": 2.2,
@@ -200,24 +201,32 @@ def build_structured_summary(item: dict[str, Any], cluster: list[dict[str, Any]]
     keyword_text = ", ".join(top_keywords) if top_keywords else "거시·정책 이슈"
     return {
         "핵심": f"{item['title'][:42]}",
-        "배경": f"{item.get('category', '일반')} 분야 핵심 변수 변화가 반영된 사안입니다.",
-        "확산": f"유사 기사 {len(cluster)}건, 매체 {len({c.get('outlet','') for c in cluster})}곳에서 동시 보도됐습니다.",
-        "포인트": f"주요 키워드: {keyword_text}.",
-        "종합": f"영향도 점수 {score:.2f}로 오늘 상위 이슈로 선정했습니다.",
+        "배경": f"{item.get('category', '일반')} 분야 현안과 연결된 이슈입니다.",
+        "확산": f"관련 보도가 {len(cluster)}건 이어지며 관심이 확대됐습니다.",
+        "포인트": f"{keyword_text} 키워드 중심으로 전개되고 있습니다.",
+        "종합": "향후 정책·시장 반응을 함께 볼 필요가 있습니다.",
     }
 
 
 def build_article_5lines(item: dict[str, Any], cluster: list[dict[str, Any]], score: float) -> list[str]:
+    description = (item.get("description", "") or "").strip()
+    description = description[:64] if description else "관련 핵심 쟁점이 보도에서 함께 언급됐습니다."
+    keyword_text = ", ".join(item.get("matched_keywords", [])[:3]) or "핵심 현안"
     return [
-        f"1) {item.get('category', '일반')} 핵심 사안으로 분류됩니다.",
-        f"2) 대표 제목은 ‘{item['title'][:34]}’ 입니다.",
-        f"3) 중복 기사 {len(cluster)}건을 묶어 이슈 단위로 정리했습니다.",
-        f"4) 영향도 점수는 {score:.2f}, 중요도는 {assign_stars(score)}성입니다.",
-        "5) 정책·시장·국제 파급 가능성을 중심으로 우선 배치했습니다.",
+        f"1) {item['title'][:44]}",
+        f"2) {description}",
+        f"3) {item.get('outlet', '주요 매체')} 보도를 통해 핵심 내용이 확인됐습니다.",
+        f"4) 관련 키워드는 {keyword_text} 입니다.",
+        "5) 추가 발표와 후속 조치 여부를 계속 확인할 필요가 있습니다.",
     ]
 
 
-def build_cluster_record(cluster: list[dict[str, Any]], trend_scores: dict[str, float], now: datetime) -> dict[str, Any]:
+def build_cluster_record(
+    cluster: list[dict[str, Any]],
+    trend_scores: dict[str, float],
+    now: datetime,
+    representative_reason: str,
+) -> dict[str, Any]:
     representative = sorted(cluster, key=lambda x: x["pub_date_kst"], reverse=True)[0]
     score = importance_score(representative, cluster, trend_scores, now)
 
@@ -229,7 +238,30 @@ def build_cluster_record(cluster: list[dict[str, Any]], trend_scores: dict[str, 
     representative["major_keywords"] = representative.get("matched_keywords", [])[:5]
     representative["structured_summary"] = build_structured_summary(representative, cluster, score)
     representative["article_summary_5lines"] = build_article_5lines(representative, cluster, score)
+    representative["cluster_representative_reason"] = representative_reason
     return representative
+
+
+def filter_recent_24h(items: list[dict[str, Any]], now: datetime) -> list[dict[str, Any]]:
+    cutoff = now.timestamp() - (24 * 3600)
+    filtered: list[dict[str, Any]] = []
+    for item in items:
+        pub_kst = item.get("pub_date_kst")
+        if not pub_kst:
+            continue
+        try:
+            ts = datetime.fromisoformat(pub_kst).timestamp()
+        except ValueError:
+            continue
+        if cutoff <= ts <= now.timestamp():
+            filtered.append(item)
+    return filtered
+
+
+def split_candidate_pools(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    main_pool = [item for item in items if item.get("category") in MAIN_CATEGORIES]
+    semiconductor_pool = [item for item in items if item.get("category") == "반도체" or item.get("is_semiconductor")]
+    return main_pool, semiconductor_pool
 
 
 def make_top_summary(main_items: list[dict[str, Any]], semicon_items: list[dict[str, Any]]) -> list[str]:
@@ -253,37 +285,56 @@ def main() -> None:
         raise FileNotFoundError("Missing data/news_candidates.json. Run fetch_naver_news.py first.")
 
     payload = json.loads(source_path.read_text(encoding="utf-8"))
-    items = payload.get("items", [])
+    all_items = payload.get("items", [])
     trend_scores = payload.get("trend_scores", {})
     now = datetime.now(tz=KST)
-    cutoff = now.timestamp() - (24 * 3600)
 
-    # Safety filter: only rank/cluster stories from the most recent 24 hours in KST.
-    filtered_items: list[dict[str, Any]] = []
-    for item in items:
-        pub_kst = item.get("pub_date_kst")
-        if not pub_kst:
-            continue
-        try:
-            ts = datetime.fromisoformat(pub_kst).timestamp()
-        except ValueError:
-            continue
-        if cutoff <= ts <= now.timestamp():
-            filtered_items.append(item)
-    items = filtered_items
+    # Keep main and semiconductor pipelines explicitly separate.
+    main_pool_raw, semiconductor_pool_raw = split_candidate_pools(all_items)
 
-    clusters = cluster_items(items)
-    merged = [build_cluster_record(cluster, trend_scores, now) for cluster in clusters]
-    merged.sort(key=lambda x: x["score"], reverse=True)
+    # Strict 24-hour filter is applied before any clustering/ranking.
+    main_pool_24h = filter_recent_24h(main_pool_raw, now)
+    semiconductor_pool_24h = filter_recent_24h(semiconductor_pool_raw, now)
 
-    semiconductor = [item for item in merged if item.get("is_semiconductor")]
-    main_candidates = [item for item in merged if not item.get("is_semiconductor")]
+    main_clusters = cluster_items(main_pool_24h)
+    semicon_clusters = cluster_items(semiconductor_pool_24h)
 
-    if len(main_candidates) < 10:
-        main_candidates.extend([item for item in semiconductor if item not in main_candidates])
+    main_merged = [
+        build_cluster_record(
+            cluster,
+            trend_scores,
+            now,
+            representative_reason="most_recent_article_in_main_cluster_within_24h",
+        )
+        for cluster in main_clusters
+    ]
+    semicon_merged = [
+        build_cluster_record(
+            cluster,
+            trend_scores,
+            now,
+            representative_reason="most_recent_article_in_semiconductor_cluster_within_24h",
+        )
+        for cluster in semicon_clusters
+    ]
 
-    main_items = main_candidates[:10]
-    semicon_items = semiconductor[:3]
+    main_merged.sort(key=lambda x: x["score"], reverse=True)
+    semicon_merged.sort(key=lambda x: x["score"], reverse=True)
+
+    # No fallback to older stories or to semiconductor pool for the main section.
+    main_items = main_merged[:10]
+    semicon_items = semicon_merged[:3]
+
+    debug_main_checks = [
+        {
+            "title": item.get("title", ""),
+            "original_publication_datetime": item.get("pub_date", ""),
+            "normalized_kst_datetime": item.get("pub_date_kst", ""),
+            "passed_24h_filter": True,
+            "cluster_representative_selection_reason": item.get("cluster_representative_reason", ""),
+        }
+        for item in main_items
+    ]
 
     output = {
         "generated_at_kst": now.isoformat(),
@@ -292,9 +343,16 @@ def main() -> None:
         "main_news": main_items,
         "semiconductor_news": semicon_items,
         "stats": {
-            "raw_candidates_24h": len(items),
-            "clustered_groups": len(clusters),
+            "raw_main_candidates": len(main_pool_raw),
+            "raw_semiconductor_candidates": len(semiconductor_pool_raw),
+            "main_candidates_24h": len(main_pool_24h),
+            "semiconductor_candidates_24h": len(semiconductor_pool_24h),
+            "main_clustered_groups": len(main_clusters),
+            "semiconductor_clustered_groups": len(semicon_clusters),
             "trend_boost_enabled": bool(trend_scores),
+        },
+        "debug": {
+            "selected_main_story_checks": debug_main_checks,
         },
     }
 
