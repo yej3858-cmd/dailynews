@@ -255,12 +255,73 @@ def sanitize_editorial_line(line: str, title: str, fallback: str) -> str:
     return clean
 
 
+def split_korean_sentences(text: str) -> list[str]:
+    cleaned = re.sub(r"\s+", " ", (text or "").strip())
+    if not cleaned:
+        return []
+    # Split by sentence punctuation while keeping complete Korean sentence units.
+    parts = re.split(r"(?<=[\.\!\?다요])\s+", cleaned)
+    sentences: list[str] = []
+    for part in parts:
+        s = part.strip(" \t\r\n-–—")
+        if not s:
+            continue
+        sentences.append(s)
+    return sentences
+
+
+def is_complete_sentence(sentence: str) -> bool:
+    s = sentence.strip()
+    if len(s) < 8:
+        return False
+    # Allow sentence-final punctuation, but ensure the base token is valid.
+    base = re.sub(r"[\.!?]+$", "", s).strip()
+    if re.search(r"[가-힣A-Za-z0-9]$", base) is None:
+        return False
+    if s.endswith(("다", "요", ".", "!", "?", "니다", "됩니다", "했습니다", "입니다", "됨")):
+        return True
+    return False
+
+
+def finalize_sentence(sentence: str) -> str | None:
+    s = sentence.strip()
+    if not s:
+        return None
+    if not re.search(r"[\.!?]$", s):
+        # Korean briefing style can end with "다/요" without punctuation; add period for consistency.
+        if s.endswith(("다", "요", "니다", "됨")):
+            s = f"{s}."
+    if not is_complete_sentence(s):
+        return None
+    return s
+
+
+def sanitize_summary_lines(lines: list[str], title: str) -> list[str]:
+    final: list[str] = []
+    for line in lines:
+        safe = sanitize_editorial_line(
+            line,
+            title,
+            "핵심 사실과 후속 발표 내용을 중심으로 추가 확인이 필요합니다.",
+        )
+        normalized = finalize_sentence(safe)
+        if normalized is None:
+            continue
+        if too_similar_to_title(normalized, title):
+            continue
+        final.append(normalized)
+        if len(final) == 5:
+            break
+    return final
+
+
 def build_structured_summary(item: dict[str, Any], cluster: list[dict[str, Any]], score: float) -> dict[str, str]:
     top_keywords = item.get("major_keywords", [])[:3]
     keyword_text = ", ".join(top_keywords) if top_keywords else "핵심 변수"
     title = item.get("title", "")
     description = (item.get("description", "") or "").strip()
-    desc_part = description[:44] if description else "정책·시장 변수에 영향이 큰 사안으로 해석됩니다."
+    split_desc = split_korean_sentences(description)
+    desc_part = split_desc[0] if split_desc else "정책·시장 변수에 영향이 큰 사안으로 해석됩니다."
     return {
         "핵심": sanitize_editorial_line(
             f"{desc_part}",
@@ -293,24 +354,33 @@ def build_structured_summary(item: dict[str, Any], cluster: list[dict[str, Any]]
 def build_article_5lines(item: dict[str, Any], cluster: list[dict[str, Any]], score: float) -> list[str]:
     title = item.get("title", "")
     description = (item.get("description", "") or "").strip()
-    description = description[:64] if description else "핵심 쟁점과 이해관계자 반응이 함께 보도됐습니다."
+    body_sentences = split_korean_sentences(description)
+    primary_body = body_sentences[0] if body_sentences else "핵심 쟁점과 이해관계자 반응이 함께 보도됐습니다."
+    secondary_body = body_sentences[1] if len(body_sentences) > 1 else "주요 수치와 일정이 추가 보도에서 점차 구체화되고 있습니다."
     keywords = item.get("major_keywords", [])[:3]
     keyword_text = ", ".join(keywords) if keywords else "핵심 변수"
     candidates = [
-        description,
+        primary_body,
+        secondary_body,
         f"{item.get('category', '일반')} 분야의 의사결정과 일정에 직접 영향을 줄 수 있는 내용입니다.",
         f"{keyword_text} 중심으로 이해관계자들의 해석이 엇갈리고 있습니다.",
         "후속 발표에서 수치·일정·집행 방식이 구체화되는지가 중요합니다.",
         "단기 이슈에 그치지 않고 중장기 흐름으로 이어질 가능성이 거론됩니다.",
     ]
-    return [
-        sanitize_editorial_line(
-            line,
-            title,
-            "핵심 수치와 일정이 기사 본문에서 추가로 제시됐습니다.",
-        )
-        for line in candidates
+    validated = sanitize_summary_lines(candidates, title)
+    fallback = [
+        "핵심 사실관계와 이해관계자 입장이 본문에서 확인됩니다.",
+        "기사에서 제시된 수치와 일정의 변화가 후속 쟁점으로 이어지고 있습니다.",
+        "관련 당사자의 대응 방향이 시장과 정책 판단에 영향을 줄 수 있습니다.",
+        "추가 발표에서 집행 범위와 시점이 더 구체화될 전망입니다.",
+        "단기 반응보다 중장기 파급 흐름을 함께 점검할 필요가 있습니다.",
     ]
+    while len(validated) < 5:
+        candidate = fallback[len(validated)]
+        norm = finalize_sentence(candidate)
+        if norm:
+            validated.append(norm)
+    return validated[:5]
 
 
 def clean_title_score(title: str) -> float:

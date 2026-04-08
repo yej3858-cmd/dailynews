@@ -38,6 +38,88 @@ def format_kst_datetime(value: str) -> str:
     return dt.strftime("%Y.%m.%d %H:%M")
 
 
+def build_archive_filename(payload: dict[str, Any], archive_dir: Path) -> str:
+    """Return archive filename that preserves prior runs.
+
+    - First run of the day: YYYY-MM-DD.html
+    - Additional same-day runs: YYYY-MM-DD-HHMM.html (KST)
+    """
+    date = payload.get("date", "unknown")
+    generated = payload.get("generated_at_kst", "")
+    default_name = f"{date}.html"
+    default_path = archive_dir / default_name
+    if not default_path.exists():
+        return default_name
+
+    try:
+        generated_dt = datetime.fromisoformat(generated)
+        hhmm = generated_dt.strftime("%H%M")
+    except ValueError:
+        hhmm = "0000"
+
+    candidate = f"{date}-{hhmm}.html"
+    if not (archive_dir / candidate).exists():
+        return candidate
+
+    # Very rare collision safety (e.g., repeated run in same minute).
+    seq = 2
+    while True:
+        fallback = f"{date}-{hhmm}-{seq}.html"
+        if not (archive_dir / fallback).exists():
+            return fallback
+        seq += 1
+
+
+def build_archive_index(archive_dir: Path) -> str:
+    files = sorted(
+        [p for p in archive_dir.glob("*.html") if p.name != "index.html"],
+        key=lambda p: p.name,
+        reverse=True,
+    )
+    list_items = []
+    for file in files:
+        label = file.stem.replace("-", ".")
+        list_items.append(f'<li><a href="./{html.escape(file.name)}">{html.escape(label)}</a></li>')
+    if not list_items:
+        list_items.append("<li>아카이브가 아직 없습니다.</li>")
+
+    return f"""<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>News Briefing Archive</title>
+  <style>
+    body {{
+      margin: 0;
+      background: #0b0f17;
+      color: #f4f7ff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+    }}
+    main {{
+      width: min(760px, 100%);
+      margin: 0 auto;
+      padding: 18px 14px 28px;
+    }}
+    h1 {{ margin: 8px 0 12px; font-size: 1.3rem; }}
+    ul {{ margin: 0; padding-left: 18px; }}
+    li {{ margin: 7px 0; }}
+    a {{ color: #8bb6ff; text-decoration: none; font-weight: 600; }}
+    a:hover {{ text-decoration: underline; }}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Daily News Briefing Archive</h1>
+    <ul>
+      {''.join(list_items)}
+    </ul>
+  </main>
+</body>
+</html>
+"""
+
+
 def render_structured_summary(summary: dict[str, str]) -> str:
     fields = ["핵심", "배경", "확산", "포인트", "종합"]
     rows = []
@@ -281,13 +363,15 @@ def main() -> None:
     rendered = build_html(payload)
 
     Path("archive").mkdir(exist_ok=True)
-    date = payload.get("date", "unknown")
-    archive_file = Path("archive") / f"{date}.html"
+    archive_dir = Path("archive")
+    archive_filename = build_archive_filename(payload, archive_dir)
+    archive_file = archive_dir / archive_filename
 
     Path("index.html").write_text(rendered, encoding="utf-8")
     archive_file.write_text(rendered, encoding="utf-8")
+    (archive_dir / "index.html").write_text(build_archive_index(archive_dir), encoding="utf-8")
 
-    print(f"Wrote index.html and {archive_file}")
+    print(f"Wrote index.html, {archive_file}, and archive/index.html")
 
 
 if __name__ == "__main__":
